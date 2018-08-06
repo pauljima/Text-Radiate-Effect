@@ -3,7 +3,8 @@ var radiusX = 100,
 	softSpread = 0.1,
 	moveSpace = 20,
 	
-	textArray = [];
+	textArray = [],
+	rebuildArray = [];
 
 window.addEventListener("load", init, false);
 
@@ -13,7 +14,7 @@ function init() {
 }
 
 function setupAffectedText() {
-	var clickables = holder.getElementsByTagName("span");
+	var clickables = holder.getElementsByTagName("a");
 	for (var i = 0; i < clickables.length; i++) {
 		var clickable = clickables[i];
 
@@ -25,10 +26,30 @@ function setupAffectedText() {
 function setupTextArray() {
 	textArray = holder.innerHTML.split(" ");
 
-	var txtHTML = "";
-	for (var i = 0; i < textArray.length; i++) {
+	var i,
+		txtHTML = "",
+		tag,
+		tagString = "";
+
+	// Rebuild array
+	for (i = 0; i < textArray.length; i++) {
 		var txt = textArray[i];
 
+		if (txt.substring(0, 1) == "<") tag = true;
+
+		if (tag) {
+			tagString += txt + " ";
+			if (txt.substring(txt.length-1, txt.length) == ">") {
+				tag = false;
+				rebuildArray.push(tagString);
+				tagString = "";
+			}
+		} else rebuildArray.push(txt);
+	}
+
+	// Build Text block
+	for (i = 0; i < rebuildArray.length; i++) {
+		var txt = rebuildArray[i];
 		txtHTML += "<div class='txt'>" + txt + "</div>";
 	}
 
